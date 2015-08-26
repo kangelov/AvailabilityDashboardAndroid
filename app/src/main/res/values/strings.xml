@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AvailabilityDashboard</string>
+    <string name="title_detail">Details</string>
+    <string name="update_button_text">Not yet updated</string>
+    <string name="qualicom_url">http://www.qualicom.com</string>
+    <string name="header_title_details">Details</string>
+    <string name="header_title_environments">Environments</string>
+    <string name="header_title_nodes">Nodes</string>
+    <string name="header_title_services">Services</string>
+</resources>

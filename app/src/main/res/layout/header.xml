@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+    style="@style/Base.Widget.AppCompat.ActionBar.Solid"
+    android:gravity="fill_horizontal">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Title"
+        android:id="@+id/header_title"
+        android:layout_alignParentLeft="true"
+        android:textAlignment="gravity"
+        android:textStyle="bold"
+        android:gravity="left|center_vertical" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/header_logo"
+        android:clickable="true"
+        android:src="@drawable/logo"
+        android:maxHeight="40dp"
+        android:maxWidth="40dp"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true" />
+</RelativeLayout>
