@@ -40,4 +40,5 @@ public class EnvironmentListActivityFragment extends ListActivityFragment {
     protected String getTitle() {
         return this.getString(R.string.header_title_environments);
     }
+
 }

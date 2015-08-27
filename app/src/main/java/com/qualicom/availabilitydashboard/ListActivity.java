@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,7 +36,12 @@ import java.util.List;
  * to listen for item selections.
  */
 public class ListActivity extends AppCompatActivity
-        implements ListActivityFragmentCallbacks {
+        implements ListActivityFragmentCallbacks, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+
+    public static final String ARG_DISPAYLIST = "displayList";
+    public static final String ARG_SELECTEDENVIRONMENT = "selectedEnvironment";
+    public static final String ARG_SELECTEDSERVICE = "selectedService";
+    public static final String ARG_SELECTEDNODE = "selectedNode";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -58,32 +64,36 @@ public class ListActivity extends AppCompatActivity
         getSupportActionBar().setCustomView(R.layout.header);
 
         ImageView imageView = (ImageView)findViewById(R.id.header_logo);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent logoIntent = new Intent(Intent.ACTION_VIEW);
-                logoIntent.setData(Uri.parse(getString(R.string.qualicom_url)));
-                startActivity(logoIntent);
-            }
-        });
+        imageView.setOnClickListener(this);
 
-        displayList = getDisplayList();
+        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
+
+        this.mTwoPane = (findViewById(R.id.detail_container) != null);
+
+        if (savedInstanceState != null) {
+            this.displayList = (List<Environment>) savedInstanceState.getSerializable(ARG_DISPAYLIST);
+            this.selectedEnvironment = (Environment) savedInstanceState.getSerializable(ARG_SELECTEDENVIRONMENT);
+            this.selectedService = (Service) savedInstanceState.getSerializable(ARG_SELECTEDSERVICE);
+            this.selectedNode = (Node) savedInstanceState.getSerializable(ARG_SELECTEDNODE);
+        } else {
+            displayList = getDisplayList();
+
+            Bundle arguments = new Bundle();
+            arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
+            arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
+            ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
+            environmentFragment.setArguments(arguments);
+
+            FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
+            txn.replace(R.id.list_container, environmentFragment);
+            txn.commit();
+        }
 
         // The detail container view will be present only in the
         // large-screen layouts (res/values-large and
         // res/values-sw600dp). If this view is present, then the
         // activity should be in two-pane mode.
-        mTwoPane = (findViewById(R.id.detail_container) != null);
-
-        Bundle arguments = new Bundle();
-        arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
-        arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
-        ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
-        environmentFragment.setArguments(arguments);
-
-        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
-        txn.replace(R.id.list_container, environmentFragment);
-        txn.commit();
     }
 
     private List<Environment> getDisplayList() {
@@ -96,7 +106,7 @@ public class ListActivity extends AppCompatActivity
         Bundle arguments = new Bundle();
         arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) selectedEnvironment.getServices());
         arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
-        ListActivityFragment serviceFragment = (ListActivityFragment) new ServiceListActivityFragment();
+        ListActivityFragment serviceFragment = new ServiceListActivityFragment();
         serviceFragment.setArguments(arguments);
         FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
         txn.addToBackStack(null);
@@ -111,7 +121,7 @@ public class ListActivity extends AppCompatActivity
         Bundle arguments = new Bundle();
         arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) selectedService.getNodes());
         arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
-        ListActivityFragment nodeFragment = (ListActivityFragment) new NodeListActivityFragment();
+        ListActivityFragment nodeFragment = new NodeListActivityFragment();
         nodeFragment.setArguments(arguments);
         FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
         txn.addToBackStack(null);
@@ -151,8 +161,34 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(ARG_DISPAYLIST, (Serializable) displayList);
+        outState.putSerializable(ARG_SELECTEDENVIRONMENT, selectedEnvironment);
+        outState.putSerializable(ARG_SELECTEDSERVICE, selectedService);
+        outState.putSerializable(ARG_SELECTEDNODE, selectedNode);
+    }
+
+    @Override
     public void setListTitle(String title) {
         ((TextView)getSupportActionBar().getCustomView().findViewById(R.id.header_title)).setText(title);
+    }
+
+    //On clicking the Qualicom logo
+    @Override
+    public void onClick(View v) {
+        Intent logoIntent = new Intent(Intent.ACTION_VIEW);
+        logoIntent.setData(Uri.parse(getString(R.string.qualicom_url)));
+        startActivity(logoIntent);
+    }
+
+    //On pulling list to refresh
+    @Override
+    public void onRefresh() {
+
+        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setRefreshing(false);
+
     }
 
 }
