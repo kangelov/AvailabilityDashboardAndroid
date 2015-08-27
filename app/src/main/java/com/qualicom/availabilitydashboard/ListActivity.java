@@ -85,8 +85,14 @@ public class ListActivity extends AppCompatActivity
             ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
             environmentFragment.setArguments(arguments);
 
+            ListFooterFragment footer = new ListFooterFragment();
+            Bundle footerArgs = new Bundle();
+            footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_new);
+            footer.setArguments(footerArgs);
+
             FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
             txn.replace(R.id.list_container, environmentFragment);
+            txn.replace(R.id.footer_container, footer);
             txn.commit();
         }
 
@@ -188,6 +194,15 @@ public class ListActivity extends AppCompatActivity
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setRefreshing(false);
+
+        ListFooterFragment footer = new ListFooterFragment();
+        Bundle footerArgs = new Bundle();
+        footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_updated);
+        footer.setArguments(footerArgs);
+
+        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
+        txn.replace(R.id.footer_container, footer);
+        txn.commit();
 
     }
 
