@@ -1,5 +1,6 @@
 package com.qualicom.availabilitydashboard.db;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -28,6 +29,34 @@ class SettingsDBHelper {
         String username = getSettingsValue(db, SETTINGS_KEY_USERNAME);
         String password = getSettingsValue(db, SETTINGS_KEY_PASSWORD);
         return new Settings(uri, username, password);
+    }
+
+    public static void setSettings(SQLiteDatabase db, Settings settings) {
+        db.beginTransaction();
+        try {
+            setSettingsValue(db, SETTINGS_KEY_URI, settings.getUri());
+            setSettingsValue(db, SETTINGS_KEY_USERNAME, settings.getUsername());
+            setSettingsValue(db, SETTINGS_KEY_PASSWORD, settings.getPassword());
+            db.setTransactionSuccessful();
+            Log.i("Write Database", "New settings saved successfully.");
+        } catch (SQLiteException e) {
+            Log.i("Write Database", "New settings will now be discarded.");
+            throw e;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    private static void setSettingsValue(SQLiteDatabase db, String key, String value) {
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.COL_SETTINGS_KEY, key);
+        values.put(DBHelper.COL_SETTINGS_VALUE, value);
+        try {
+            db.insertWithOnConflict(DBHelper.TABLE_SETTINGS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        } catch (SQLiteException e) {
+            Log.e("Write Database", "Error writing Settings table for key " + key + " with value " + value + ".");
+            throw e;
+        }
     }
 
 
