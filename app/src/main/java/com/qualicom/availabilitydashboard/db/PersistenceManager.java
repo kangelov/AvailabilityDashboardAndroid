@@ -53,4 +53,19 @@ public class PersistenceManager extends SQLiteOpenHelper {
         return settings;
     }
 
+    public void setSettings(Settings settings) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            SettingsDBHelper.setSettings(db, settings);
+        } catch (SQLiteException e) {
+            Log.e("Write Settings", e.getMessage(), e);
+        } finally {
+            try {
+                db.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
 }

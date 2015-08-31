@@ -16,6 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.qualicom.availabilitydashboard.db.PersistenceManager;
+import com.qualicom.availabilitydashboard.vo.Settings;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -41,8 +44,17 @@ public class LoginActivity extends Activity {
         // Set up the login form.
         mUrlView = (EditText) findViewById(R.id.login_url);
         mUsernameView = (EditText) findViewById(R.id.login_username);
-
         mPasswordView = (EditText) findViewById(R.id.password);
+
+        //Read the settings values and put them on screen
+        PersistenceManager pm = new PersistenceManager(this);
+        Settings settings = pm.getSettings();
+        if (settings != null) {
+            mUrlView.setText(settings.getUri());
+            mUsernameView.setText(settings.getUsername());
+            mPasswordView.setText(settings.getPassword());
+        }
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -194,6 +206,7 @@ public class LoginActivity extends Activity {
             showProgress(false);
 
             if (success) {
+                writeSettings();
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -205,6 +218,12 @@ public class LoginActivity extends Activity {
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+
+        private void writeSettings() {
+            Settings settings = new Settings(mUrl, mUsername, mPassword);
+            PersistenceManager pm = new PersistenceManager(LoginActivity.this);
+            pm.setSettings(settings);
         }
     }
 }
