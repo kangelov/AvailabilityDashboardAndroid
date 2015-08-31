@@ -3,6 +3,7 @@ package com.qualicom.availabilitydashboard;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,10 +14,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.qualicom.availabilitydashboard.db.PersistenceManager;
 import com.qualicom.availabilitydashboard.vo.Environment;
 import com.qualicom.availabilitydashboard.vo.ListEntry;
 import com.qualicom.availabilitydashboard.vo.Node;
 import com.qualicom.availabilitydashboard.vo.Service;
+import com.qualicom.availabilitydashboard.vo.Settings;
 
 import java.io.Serializable;
 import java.util.List;
@@ -51,6 +54,7 @@ public class ListActivity extends AppCompatActivity
      * device.
      */
     private boolean mTwoPane;
+
 
     private List<Environment> displayList;
     private Environment selectedEnvironment;
@@ -103,10 +107,30 @@ public class ListActivity extends AppCompatActivity
         // large-screen layouts (res/values-large and
         // res/values-sw600dp). If this view is present, then the
         // activity should be in two-pane mode.
+        //First, do we have Settings? If not no point to continue.
     }
 
     private List<Environment> getDisplayList() {
         return ListEntry.dummyEntries;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PersistenceManager pm = new PersistenceManager(this);
+        Settings settings = pm.getSettings();
+
+        if (settings == null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                /* Create an Intent that will start the Menu-Activity. */
+                    Intent settingsIntent = new Intent(ListActivity.this, LoginActivity.class);
+                    ListActivity.this.startActivity(settingsIntent);
+                }
+            }, 0);
+        }
+        //else refreshData();
     }
 
     @Override
