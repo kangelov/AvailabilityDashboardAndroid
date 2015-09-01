@@ -111,7 +111,8 @@ public class ListActivity extends AppCompatActivity
     }
 
     private List<Environment> getDisplayList() {
-        return ListEntry.dummyEntries;
+        PersistenceManager pm = new PersistenceManager(this);
+        return pm.getAllEnvironments();
     }
 
     @Override
@@ -218,6 +219,21 @@ public class ListActivity extends AppCompatActivity
     //On pulling list to refresh
     @Override
     public void onRefresh() {
+        //Reload the data and save it
+        PersistenceManager pm = new PersistenceManager(this);
+        pm.setAllEnvironments(ListEntry.dummyEntries);
+
+        this.recreate();
+        /*
+        //Refresh screen
+        Bundle arguments = new Bundle();
+        arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
+        arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
+        ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
+        environmentFragment.setArguments(arguments);
+
+        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
+        txn.replace(R.id.list_container, environmentFragment);
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setRefreshing(false);
@@ -227,9 +243,8 @@ public class ListActivity extends AppCompatActivity
         footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_updated);
         footer.setArguments(footerArgs);
 
-        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
         txn.replace(R.id.footer_container, footer);
-        txn.commit();
+        txn.commit(); */
 
     }
 
