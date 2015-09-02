@@ -127,11 +127,17 @@ public class ListActivity extends AppCompatActivity
                 public void run() {
                 /* Create an Intent that will start the Menu-Activity. */
                     Intent settingsIntent = new Intent(ListActivity.this, LoginActivity.class);
-                    ListActivity.this.startActivity(settingsIntent);
+                    ListActivity.this.startActivityForResult(settingsIntent, 0, null);
                 }
             }, 0);
         }
         //else refreshData();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        this.onRefresh();
     }
 
     @Override
@@ -261,7 +267,7 @@ public class ListActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.item_settings:
                 Intent menuIntent = new Intent(this, LoginActivity.class);
-                startActivity(menuIntent);
+                startActivityForResult(menuIntent, 0, null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

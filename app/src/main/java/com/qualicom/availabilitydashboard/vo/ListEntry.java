@@ -1,8 +1,5 @@
 package com.qualicom.availabilitydashboard.vo;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +38,9 @@ public class ListEntry implements Serializable {
     private Status status;
 
     private String name;
+
+    public ListEntry() {
+    }
 
     public ListEntry(String name, Status status) {
         this.name = name;

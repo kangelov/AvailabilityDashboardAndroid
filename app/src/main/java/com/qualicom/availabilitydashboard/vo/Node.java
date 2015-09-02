@@ -10,6 +10,10 @@ public class Node extends ListEntry {
 
     private String version;
 
+    public Node() {
+        super();
+    }
+
     public Node(String name, Status status, String response, String version) {
         super(name, status);
         this.response = response;

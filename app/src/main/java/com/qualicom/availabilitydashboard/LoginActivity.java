@@ -24,6 +24,8 @@ import com.qualicom.availabilitydashboard.vo.Settings;
  */
 public class LoginActivity extends Activity {
 
+    public static final String ARG_REFRESH_ACTIVITY = "refreshActivity";
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */

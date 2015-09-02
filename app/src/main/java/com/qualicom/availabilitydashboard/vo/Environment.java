@@ -9,6 +9,10 @@ public class Environment extends ListEntry {
 
     private List<Service> services;
 
+    public Environment() {
+        super();
+    }
+
     public Environment(String name, Status status) {
         super(name, status);
     }

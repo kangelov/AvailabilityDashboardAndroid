@@ -17,8 +17,16 @@ public class Service extends ListEntry {
         this.nodes = nodes;
     }
 
+    public Service() {
+        super();
+    }
+
     public Service(String name, Status status) {
         super(name, status);
+    }
+
+    public void setNodes(List<Node> nodes) {
+        this.nodes = nodes;
     }
 
     public Service(String name, Status status, List<Node> nodes) {
