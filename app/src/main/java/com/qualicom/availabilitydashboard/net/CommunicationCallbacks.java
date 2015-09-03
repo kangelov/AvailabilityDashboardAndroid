@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by kangelov on 2015-09-02.
  */
-public interface CommunicationHandler {
+public interface CommunicationCallbacks {
 
     void handleResponse(List<Environment> environmentList, Date updateTime);
 

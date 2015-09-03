@@ -12,7 +12,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.qualicom.availabilitydashboard.AvailabilityDashboardApplication;
 import com.qualicom.availabilitydashboard.db.PersistenceManager;
@@ -37,8 +36,7 @@ public class CommunicationManager {
 
                 @Override
                 public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                    final JsonObject jsonObject = json.getAsJsonObject();
-                    long msSince1970 = jsonObject.getAsLong();
+                    final long msSince1970 = json.getAsLong();
                     return new Date(msSince1970);
                 }
             }).
@@ -46,8 +44,7 @@ public class CommunicationManager {
 
                 @Override
                 public Status deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                    final JsonObject jsonObject = json.getAsJsonObject();
-                    String statusStr = jsonObject.getAsString();
+                    final String statusStr = json.getAsString();
                     for (Status status : Status.values()) {
                         if (status.toString().equalsIgnoreCase(statusStr)) {
                             return status;
@@ -59,16 +56,19 @@ public class CommunicationManager {
             create();
 
     private final Settings settings;
-    private final CommunicationHandler handler;
+    private final CommunicationCallbacks handler;
     private final PersistenceManager pm;
 
-    public CommunicationManager(CommunicationHandler handler, PersistenceManager pm) {
+    public CommunicationManager(CommunicationCallbacks handler, PersistenceManager pm) {
         this.pm = pm;
         this.handler = handler;
         this.settings = pm.getSettings();
     }
 
     public void refreshAvailability() {
+        //cancel any previous requests.
+        AvailabilityDashboardApplication.getInstance().getRequestQueue().cancelAll(TAG);
+
         String url = settings.getUri();
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -95,6 +95,7 @@ public class CommunicationManager {
                 return headers;
             }
         };
+        request.setShouldCache(false);
         AvailabilityDashboardApplication.getInstance().addToRequestQueue(request, TAG);
 
     }

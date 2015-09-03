@@ -13,15 +13,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qualicom.availabilitydashboard.db.PersistenceManager;
+import com.qualicom.availabilitydashboard.net.CommunicationCallbacks;
+import com.qualicom.availabilitydashboard.net.CommunicationManager;
 import com.qualicom.availabilitydashboard.vo.Environment;
-import com.qualicom.availabilitydashboard.vo.ListEntry;
 import com.qualicom.availabilitydashboard.vo.Node;
 import com.qualicom.availabilitydashboard.vo.Service;
 import com.qualicom.availabilitydashboard.vo.Settings;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 
@@ -42,7 +45,7 @@ import java.util.List;
  * to listen for item selections.
  */
 public class ListActivity extends AppCompatActivity
-        implements ListActivityFragmentCallbacks, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+        implements ListActivityFragmentCallbacks, CommunicationCallbacks, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String ARG_DISPAYLIST = "displayList";
     public static final String ARG_SELECTEDENVIRONMENT = "selectedEnvironment";
@@ -225,33 +228,8 @@ public class ListActivity extends AppCompatActivity
     //On pulling list to refresh
     @Override
     public void onRefresh() {
-        //Reload the data and save it
-        PersistenceManager pm = new PersistenceManager(this);
-        pm.setAllEnvironments(ListEntry.dummyEntries);
-
-        this.recreate();
-        /*
-        //Refresh screen
-        Bundle arguments = new Bundle();
-        arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
-        arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
-        ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
-        environmentFragment.setArguments(arguments);
-
-        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
-        txn.replace(R.id.list_container, environmentFragment);
-
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        swipeLayout.setRefreshing(false);
-
-        ListFooterFragment footer = new ListFooterFragment();
-        Bundle footerArgs = new Bundle();
-        footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_updated);
-        footer.setArguments(footerArgs);
-
-        txn.replace(R.id.footer_container, footer);
-        txn.commit(); */
-
+        CommunicationManager manager = new CommunicationManager(this, new PersistenceManager(this));
+        manager.refreshAvailability();
     }
 
     @Override
@@ -274,4 +252,41 @@ public class ListActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void handleResponse(List<Environment> environmentList, Date updateTime) {
+        Toast toast = Toast.makeText(this, R.string.communication_successful, Toast.LENGTH_SHORT);
+        toast.show();
+
+        this.displayList = environmentList;
+
+        //Refresh screen
+        Bundle arguments = new Bundle();
+        arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
+        arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
+        ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
+        environmentFragment.setArguments(arguments);
+
+        FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
+        txn.replace(R.id.list_container, environmentFragment);
+
+        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setRefreshing(false);
+
+        ListFooterFragment footer = new ListFooterFragment();
+        Bundle footerArgs = new Bundle();
+        footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_updated);
+        footer.setArguments(footerArgs);
+
+        txn.replace(R.id.footer_container, footer);
+        txn.commit();
+    }
+
+    @Override
+    public void handleError(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        toast.show();
+
+        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setRefreshing(false);
+    }
 }

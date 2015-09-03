@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.qualicom.availabilitydashboard.vo.ListEntry;
 import com.qualicom.availabilitydashboard.vo.Status;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,20 +21,19 @@ import java.util.Map;
 public class ListActivityFragmentArrayAdapter extends ArrayAdapter<ListEntry> {
 
 
-    private final List<ListEntry> entries;
-
-    private final Context context;
-
-    private final boolean doShowDescription;
-
     private final static Map<Status, Integer> STATUS_TO_ICON_MAP = new HashMap<Status,Integer>();
     private final static Status DEFAULT_STATUS=Status.UNKNOWN;
+
     static {
         STATUS_TO_ICON_MAP.put(Status.OK, R.drawable.ok);
         STATUS_TO_ICON_MAP.put(Status.WRONG_VERSION, R.drawable.wrong_version);
         STATUS_TO_ICON_MAP.put(Status.FAILED, R.drawable.failed);
         STATUS_TO_ICON_MAP.put(Status.UNKNOWN, R.drawable.unknown);
     }
+
+    private final List<ListEntry> entries;
+    private final Context context;
+    private final boolean doShowDescription;
 
 
     public ListActivityFragmentArrayAdapter(Context context, List<ListEntry> entries, boolean doShowDescription) {

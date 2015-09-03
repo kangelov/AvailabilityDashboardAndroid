@@ -9,14 +9,6 @@ public class Service extends ListEntry {
 
     private List<Node> nodes;
 
-    public List<Node> getNodes() {
-        return nodes;
-    }
-
-    public void setNodes(List<Node> nodes) {
-        this.nodes = nodes;
-    }
-
     public Service() {
         super();
     }
@@ -25,12 +17,16 @@ public class Service extends ListEntry {
         super(name, status);
     }
 
-    public void setNodes(List<Node> nodes) {
+    public Service(String name, Status status, List<Node> nodes) {
+        super(name, status);
         this.nodes = nodes;
     }
 
-    public Service(String name, Status status, List<Node> nodes) {
-        super(name, status);
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
     }
 }

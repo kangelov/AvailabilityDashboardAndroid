@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -108,6 +109,10 @@ public class LoginActivity extends Activity {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
+        }
+
+        if (!TextUtils.isEmpty(url) && Uri.parse(url).getHost() != null) {
+            mUrlView.setError(getString(R.string.error_invalid_url));
         }
 
         // Check for a valid email address.

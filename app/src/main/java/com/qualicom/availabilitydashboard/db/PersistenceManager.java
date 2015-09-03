@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.qualicom.availabilitydashboard.vo.Environment;
-import com.qualicom.availabilitydashboard.vo.ListEntry;
 import com.qualicom.availabilitydashboard.vo.Settings;
 
 import java.util.List;
@@ -34,18 +33,6 @@ public class PersistenceManager extends SQLiteOpenHelper {
                 Log.e("Create Database", e.getMessage(), e);
                 throw e;
             }
-        }
-        //Now load sample data for me to look at.
-        Log.i("Sample Data", "About to load some sample data into SQLite. This should be removed when development is complete.");
-        try {
-            db.beginTransaction();
-            setAllEnvironments(ListEntry.dummyEntries, db);
-            db.setTransactionSuccessful();
-        } catch (SQLiteException e) {
-            Log.e("Sample Data", e.getMessage(), e);
-            throw e;
-        } finally {
-            db.endTransaction();
         }
     }
 
