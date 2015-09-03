@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,7 +25,6 @@ import com.qualicom.availabilitydashboard.vo.Service;
 import com.qualicom.availabilitydashboard.vo.Settings;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 
@@ -96,10 +96,6 @@ public class ListActivity extends AppCompatActivity
             environmentFragment.setArguments(arguments);
 
             ListFooterFragment footer = new ListFooterFragment();
-            Bundle footerArgs = new Bundle();
-            footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_new);
-            footer.setArguments(footerArgs);
-
             FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
             txn.replace(R.id.list_container, environmentFragment);
             txn.replace(R.id.footer_container, footer);
@@ -118,11 +114,15 @@ public class ListActivity extends AppCompatActivity
         return pm.getAllEnvironments();
     }
 
+    private Settings getSettings() {
+        PersistenceManager pm = new PersistenceManager(this);
+        return pm.getSettings();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        PersistenceManager pm = new PersistenceManager(this);
-        Settings settings = pm.getSettings();
+        Settings settings = getSettings();
 
         if (settings == null) {
             new Handler().postDelayed(new Runnable() {
@@ -253,11 +253,15 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void handleResponse(List<Environment> environmentList, Date updateTime) {
+    public void handleResponse(List<Environment> environmentList) {
         Toast toast = Toast.makeText(this, R.string.communication_successful, Toast.LENGTH_SHORT);
         toast.show();
 
         this.displayList = environmentList;
+
+        //clear the back stack. We are starting over.
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++)
+            getSupportFragmentManager().popBackStack();
 
         //Refresh screen
         Bundle arguments = new Bundle();
@@ -272,17 +276,14 @@ public class ListActivity extends AppCompatActivity
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setRefreshing(false);
 
-        ListFooterFragment footer = new ListFooterFragment();
-        Bundle footerArgs = new Bundle();
-        footerArgs.putInt(ListFooterFragment.ARG_FOOTER_LAYOUT, R.layout.list_footer_updated);
-        footer.setArguments(footerArgs);
-
-        txn.replace(R.id.footer_container, footer);
+        txn.replace(R.id.footer_container, new ListFooterFragment());
         txn.commit();
     }
 
     @Override
     public void handleError(String message) {
+        if (TextUtils.isEmpty(message))
+            message = getString(R.string.communication_failed);
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         toast.show();
 

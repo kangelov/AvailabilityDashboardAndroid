@@ -12,4 +12,5 @@
     <string name="prompt_username">Username</string>
     <string name="communication_successful">Refresh successful.</string>
     <string name="error_invalid_url">URL is invalid.</string>
+    <string name="communication_failed">Refresh failed.</string>
 </resources>

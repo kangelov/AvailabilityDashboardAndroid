@@ -2,7 +2,6 @@ package com.qualicom.availabilitydashboard.net;
 
 import com.qualicom.availabilitydashboard.vo.Environment;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,7 +9,7 @@ import java.util.List;
  */
 public interface CommunicationCallbacks {
 
-    void handleResponse(List<Environment> environmentList, Date updateTime);
+    void handleResponse(List<Environment> environmentList);
 
     void handleError(String message);
 

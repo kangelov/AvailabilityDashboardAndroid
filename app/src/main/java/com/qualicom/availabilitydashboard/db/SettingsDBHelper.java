@@ -17,6 +17,8 @@ class SettingsDBHelper {
     public static final String SETTINGS_KEY_URI = "uri";
     public static final String SETTINGS_KEY_USERNAME = "username";
     public static final String SETTINGS_KEY_PASSWORD = "password";
+    public static final String SETTINGS_KEY_LAST_REFRESH_DATE = "lastRefreshDate";
+    public static final String SETTINGS_KEY_LAST_UPDATE_DATE = "lastUpdateDate";
 
     private SettingsDBHelper() {
         //Don't instantiate
@@ -28,7 +30,9 @@ class SettingsDBHelper {
             return null;
         String username = getSettingsValue(db, SETTINGS_KEY_USERNAME);
         String password = getSettingsValue(db, SETTINGS_KEY_PASSWORD);
-        return new Settings(uri, username, password);
+        String lastUpdateDate = getSettingsValue(db, SETTINGS_KEY_LAST_UPDATE_DATE);
+        String lastRefreshDate = getSettingsValue(db, SETTINGS_KEY_LAST_REFRESH_DATE);
+        return new Settings(uri, username, password, lastRefreshDate, lastUpdateDate);
     }
 
     public static void setSettings(SQLiteDatabase db, Settings settings) {
@@ -37,6 +41,8 @@ class SettingsDBHelper {
             setSettingsValue(db, SETTINGS_KEY_URI, settings.getUri());
             setSettingsValue(db, SETTINGS_KEY_USERNAME, settings.getUsername());
             setSettingsValue(db, SETTINGS_KEY_PASSWORD, settings.getPassword());
+            setSettingsValue(db, SETTINGS_KEY_LAST_REFRESH_DATE, settings.getLastRefreshDate());
+            setSettingsValue(db, SETTINGS_KEY_LAST_UPDATE_DATE, settings.getLastUpdateDate());
             db.setTransactionSuccessful();
             Log.i("Write Database", "New settings saved successfully.");
         } catch (SQLiteException e) {

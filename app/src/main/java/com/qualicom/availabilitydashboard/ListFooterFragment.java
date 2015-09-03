@@ -3,37 +3,31 @@ package com.qualicom.availabilitydashboard;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.qualicom.availabilitydashboard.db.PersistenceManager;
+import com.qualicom.availabilitydashboard.vo.Settings;
 
 /**
  * Created by kangelov on 2015-08-27.
  */
 public class ListFooterFragment extends Fragment {
 
-    public static final String ARG_FOOTER_LAYOUT = "footerLayout";
+    private static final String ARG_FOOTER_SETTINGS = "footerSettings";
 
-    private Integer layout;
+    private static final int LAYOUT_FOOTER_NEW = R.layout.list_footer_new;
+    private static final int LAYOUT_FOOTER_UPDATED = R.layout.list_footer_updated;
 
-    @Override
-    public void setArguments(Bundle args) {
-        super.setArguments(args);
-        if (args != null && args.containsKey(ARG_FOOTER_LAYOUT))
-            this.layout = args.getInt(ARG_FOOTER_LAYOUT);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.containsKey(ARG_FOOTER_LAYOUT))
-            this.layout = savedInstanceState.getInt(ARG_FOOTER_LAYOUT);
-    }
+    private Settings settings;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(ARG_FOOTER_LAYOUT, this.layout);
+        outState.putSerializable(ARG_FOOTER_SETTINGS, settings);
     }
 
     @Nullable
@@ -41,13 +35,22 @@ public class ListFooterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = null;
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(ARG_FOOTER_LAYOUT))
-            this.layout = savedInstanceState.getInt(ARG_FOOTER_LAYOUT);
+        if (savedInstanceState != null && savedInstanceState.containsKey(ARG_FOOTER_SETTINGS)) {
+            settings = (Settings) savedInstanceState.getSerializable(ARG_FOOTER_SETTINGS);
+        } else {
+            PersistenceManager pm = new PersistenceManager(getActivity());
+            settings = pm.getSettings();
+        }
 
-        if (layout != null)
-            view = inflater.inflate(layout, container, false);
-        else
-            view = super.onCreateView(inflater, container, savedInstanceState);
+        if (settings == null || TextUtils.isEmpty(settings.getLastRefreshDate()) || TextUtils.isEmpty(settings.getLastUpdateDate()))
+            view = inflater.inflate(LAYOUT_FOOTER_NEW, container, false);
+        else {
+            view = inflater.inflate(LAYOUT_FOOTER_UPDATED, container, false);
+            TextView lastUpdateDateView = (TextView) view.findViewById(R.id.footer_last_updated_date);
+            TextView lastRefreshDateView = (TextView) view.findViewById(R.id.footer_last_fetched_date);
+            lastUpdateDateView.setText(settings.getLastUpdateDate());
+            lastRefreshDateView.setText(settings.getLastRefreshDate());
+        }
         return view;
     }
 }

@@ -19,6 +19,8 @@ import com.qualicom.availabilitydashboard.vo.Settings;
 import com.qualicom.availabilitydashboard.vo.Status;
 
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +30,8 @@ import java.util.Map;
  * Created by kangelov on 2015-09-02.
  */
 public class CommunicationManager {
+
+    private static final DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String TAG = "CommunicationManager";
 
@@ -76,7 +80,10 @@ public class CommunicationManager {
                 final AvailabilityResponse availabilityResponse = gson.fromJson(jsonObject, AvailabilityResponse.class);
                 try {
                     pm.setAllEnvironments(availabilityResponse.getEnvironments());
-                    handler.handleResponse(availabilityResponse.getEnvironments(), availabilityResponse.getUpdateTime());
+                    settings.setLastRefreshDate(DATEFORMAT.format(new Date()));
+                    settings.setLastUpdateDate(DATEFORMAT.format(availabilityResponse.getUpdateTime()));
+                    pm.setSettings(settings);
+                    handler.handleResponse(availabilityResponse.getEnvironments());
                 } catch (SQLiteException e) {
                     handler.handleError(e.getLocalizedMessage());
                 }
