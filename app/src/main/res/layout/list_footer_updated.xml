@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="70dp"
@@ -9,56 +8,56 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-    android:layout_gravity="center"
-    android:columnCount="2"
-    android:columnOrderPreserved="true"
-    android:orientation="horizontal"
-    android:rowCount="2"
-    android:rowOrderPreserved="true"
-    android:textAlignment="gravity"
-    android:useDefaultMargins="false">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_column="0"
-        android:layout_row="0"
-        android:gravity="right"
-        android:text="Last Fetched: "
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/footer_last_fetched_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_column="1"
-        android:layout_columnWeight="1"
         android:layout_gravity="center"
-        android:layout_row="0"
-        android:gravity="left"
-        android:text="YYYY-MM-DD HH:MM:SS"
-        android:textStyle="bold" />
+        android:columnCount="2"
+        android:columnOrderPreserved="true"
+        android:orientation="horizontal"
+        android:rowCount="2"
+        android:rowOrderPreserved="true"
+        android:textAlignment="gravity"
+        android:useDefaultMargins="false">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_column="0"
-        android:layout_gravity="center"
-        android:layout_row="1"
-        android:gravity="right"
-        android:text="Data As Of: "
-        android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:gravity="right"
+            android:text="Last Fetched: "
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/footer_last_updated_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_column="1"
-        android:layout_columnWeight="1"
-        android:layout_gravity="center"
-        android:layout_row="1"
-        android:gravity="left"
-        android:text="YYYY-MM-DD HH:MM:SS"
-        android:textStyle="bold" />
-</GridLayout>
+        <TextView
+            android:id="@+id/footer_last_fetched_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_row="0"
+            android:gravity="left"
+            android:text="YYYY-MM-DD HH:MM:SS"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_gravity="center"
+            android:layout_row="1"
+            android:gravity="right"
+            android:text="Data As Of: "
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/footer_last_updated_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center"
+            android:layout_row="1"
+            android:gravity="left"
+            android:text="YYYY-MM-DD HH:MM:SS"
+            android:textStyle="bold" />
+    </GridLayout>
 </RelativeLayout>
