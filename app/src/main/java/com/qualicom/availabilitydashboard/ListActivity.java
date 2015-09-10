@@ -100,6 +100,9 @@ public class ListActivity extends AppCompatActivity
             txn.replace(R.id.list_container, environmentFragment);
             txn.replace(R.id.footer_container, footer);
             txn.commit();
+
+            swipeLayout.setRefreshing(true);
+            this.onRefresh();
         }
 
         // The detail container view will be present only in the

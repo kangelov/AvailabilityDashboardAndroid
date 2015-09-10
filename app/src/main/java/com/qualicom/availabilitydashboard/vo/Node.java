@@ -39,4 +39,9 @@ public class Node extends ListEntry {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    @Override
+    public String getDescription() {
+        return getVersion();
+    }
 }

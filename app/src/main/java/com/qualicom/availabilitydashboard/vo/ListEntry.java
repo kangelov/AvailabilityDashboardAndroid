@@ -63,4 +63,9 @@ public class ListEntry implements Serializable {
         this.status = status;
     }
 
+    //this must be overriden with something meaningful.
+    public String getDescription() {
+        return getName();
+    }
+
 }

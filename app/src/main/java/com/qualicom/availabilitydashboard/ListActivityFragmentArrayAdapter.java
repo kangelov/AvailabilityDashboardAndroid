@@ -54,7 +54,7 @@ public class ListActivityFragmentArrayAdapter extends ArrayAdapter<ListEntry> {
         ImageView statusView = (ImageView) rowView.findViewById(R.id.statusImageView);
 
         nameView.setText(entries.get(position).getName());
-        descriptionView.setText(doShowDescription && entries.get(position).getStatus() != null ? entries.get(position).getStatus().name() : null);
+        descriptionView.setText(doShowDescription ? entries.get(position).getDescription() : null);
         if (entries.get(position).getStatus() != null && STATUS_TO_ICON_MAP.containsKey(entries.get(position).getStatus())) {
             statusView.setImageResource(STATUS_TO_ICON_MAP.get(entries.get(position).getStatus()));
         } else {
