@@ -1,6 +1,7 @@
 package com.qualicom.availabilitydashboard.net;
 
 import android.database.sqlite.SQLiteException;
+import android.text.TextUtils;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -73,37 +74,40 @@ public class CommunicationManager {
         //cancel any previous requests.
         AvailabilityDashboardApplication.getInstance().getRequestQueue().cancelAll(TAG);
 
-        String url = settings.getUri();
-        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String jsonObject) {
-                final AvailabilityResponse availabilityResponse = gson.fromJson(jsonObject, AvailabilityResponse.class);
-                try {
-                    pm.setAllEnvironments(availabilityResponse.getEnvironments());
-                    settings.setLastRefreshDate(DATEFORMAT.format(new Date()));
-                    settings.setLastUpdateDate(DATEFORMAT.format(availabilityResponse.getUpdateTime()));
-                    pm.setSettings(settings);
-                    handler.handleResponse(availabilityResponse.getEnvironments());
-                } catch (SQLiteException e) {
-                    handler.handleError(e.getLocalizedMessage());
+        if (settings == null || TextUtils.isEmpty(settings.getUri()))
+            handler.handleError(null);
+        else {
+            String url = settings.getUri();
+            StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String jsonObject) {
+                    final AvailabilityResponse availabilityResponse = gson.fromJson(jsonObject, AvailabilityResponse.class);
+                    try {
+                        pm.setAllEnvironments(availabilityResponse.getEnvironments());
+                        settings.setLastRefreshDate(DATEFORMAT.format(new Date()));
+                        settings.setLastUpdateDate(DATEFORMAT.format(availabilityResponse.getUpdateTime()));
+                        pm.setSettings(settings);
+                        handler.handleResponse(availabilityResponse.getEnvironments());
+                    } catch (SQLiteException e) {
+                        handler.handleError(e.getLocalizedMessage());
+                    }
                 }
-            }
-        }, new Response.ErrorListener() {
+            }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                handler.handleError(volleyError.getLocalizedMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Accept", "application/json");
-                return headers;
-            }
-        };
-        request.setShouldCache(false);
-        AvailabilityDashboardApplication.getInstance().addToRequestQueue(request, TAG);
-
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    handler.handleError(volleyError.getLocalizedMessage());
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Accept", "application/json");
+                    return headers;
+                }
+            };
+            request.setShouldCache(false);
+            AvailabilityDashboardApplication.getInstance().addToRequestQueue(request, TAG);
+        }
     }
 }

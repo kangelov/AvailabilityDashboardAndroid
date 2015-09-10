@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -87,22 +89,13 @@ public class ListActivity extends AppCompatActivity
             this.selectedService = (Service) savedInstanceState.getSerializable(ARG_SELECTEDSERVICE);
             this.selectedNode = (Node) savedInstanceState.getSerializable(ARG_SELECTEDNODE);
         } else {
-            displayList = getDisplayList();
+            this.resetSelections(getDisplayList());
 
-            Bundle arguments = new Bundle();
-            arguments.putSerializable(ListActivityFragment.ARG_DISPLAY_LIST, (Serializable) displayList);
-            arguments.putBoolean(ListActivityFragment.ARG_ONE_CLICK_ACTIVATION, mTwoPane);
-            ListActivityFragment environmentFragment = new EnvironmentListActivityFragment();
-            environmentFragment.setArguments(arguments);
-
-            ListFooterFragment footer = new ListFooterFragment();
-            FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
-            txn.replace(R.id.list_container, environmentFragment);
-            txn.replace(R.id.footer_container, footer);
-            txn.commit();
-
-            swipeLayout.setRefreshing(true);
-            this.onRefresh();
+            Settings settings = getSettings();
+            if (settings != null) {
+                swipeLayout.setRefreshing(true);
+                this.onRefresh();
+            }
         }
 
         // The detail container view will be present only in the
@@ -137,7 +130,6 @@ public class ListActivity extends AppCompatActivity
                 }
             }, 0);
         }
-        //else refreshData();
     }
 
     @Override
@@ -256,15 +248,56 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void handleResponse(List<Environment> environmentList) {
-        Toast toast = Toast.makeText(this, R.string.communication_successful, Toast.LENGTH_SHORT);
-        toast.show();
+    public void onBackPressed() {
+        super.onBackPressed();
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_container);
+        if (fragment instanceof EnvironmentListActivityFragment) {
+            Log.i("BACK", "Back to environment fragment");
+            selectedEnvironment = null;
+            selectedService = null;
+            selectedNode = null;
+        } else if (fragment instanceof ServiceListActivityFragment) {
+            Log.i("BACK", "Back to service fragment");
+            selectedService = null;
+            selectedNode = null;
+        } else if (mTwoPane && fragment instanceof NodeListActivityFragment) {
+            /*
+            In a two-panel arrangement (e.g. tablet) there is no transition between List activity and Detail
+            activity, it's all done within the list activity and the detail is just a fragment. Going back
+            *should* trigger the onBackPressed handler. This needs to be tested.
+            */
+            Log.i("BACK", "Back to node fragment");
+            selectedNode = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_container);
+        if (!mTwoPane && fragment instanceof NodeListActivityFragment) {
+            /*
+            In a single-panel arrangement (e.g. phone) there is a transition to a new activity. The Detail
+            fragment is in a separate activity, so going back changes the entire activity. onBackPressed
+            isn't getting called, but onResume is as the entire activity is resumed.
+             */
+            Log.i("BACK", "Back to node fragment");
+            selectedNode = null;
+        }
+    }
+
+    /**
+     * This is called when we cannot preserve the user selections as things have changed on the
+     * backend and one or more of the selected components are now unavailable. We need to clear
+     * everything and go back to the environment panel.
+     */
+    private void resetSelections(List<Environment> environmentList) {
 
         this.displayList = environmentList;
 
-        //clear the back stack. We are starting over.
-        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++)
-            getSupportFragmentManager().popBackStack();
+        selectedEnvironment = null;
+        selectedNode = null;
+        selectedService = null;
 
         //Refresh screen
         Bundle arguments = new Bundle();
@@ -275,12 +308,84 @@ public class ListActivity extends AppCompatActivity
 
         FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
         txn.replace(R.id.list_container, environmentFragment);
+        txn.replace(R.id.footer_container, new ListFooterFragment());
+        txn.commit();
+    }
+
+    @Override
+    public void handleResponse(List<Environment> environmentList) {
+        Toast toast = Toast.makeText(this, R.string.communication_successful, Toast.LENGTH_SHORT);
+        toast.show();
+
+        //clear the back stack. We are starting over.
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++)
+            getSupportFragmentManager().popBackStack();
+
+        restoreEnvironmentSelection(environmentList);
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setRefreshing(false);
+    }
 
-        txn.replace(R.id.footer_container, new ListFooterFragment());
-        txn.commit();
+    private void restoreEnvironmentSelection(List<Environment> environmentList) {
+        if (selectedEnvironment != null) {
+            Environment oldEnvironment = selectedEnvironment;
+            selectedEnvironment = null;
+            for (int i = 0; i < environmentList.size(); i++) {
+                Environment newEnvironment = environmentList.get(i);
+                if (oldEnvironment.equals(newEnvironment)) {
+                    selectedEnvironment = newEnvironment;
+                    this.onEnvironmentSelected(i);
+                    this.restoreServiceSelection(newEnvironment.getServices());
+                }
+            }
+            if (selectedEnvironment == null) {
+
+                //if the environment selection cannot be repeated, kick back to the environment fragment
+                //since there is nothing else to do this for us here. This is the reset scenario.
+                resetSelections(environmentList);
+                Toast toast = Toast.makeText(this, R.string.unavailable_environment_selection, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    }
+
+    private void restoreServiceSelection(List<Service> serviceList) {
+        if (selectedService != null) {
+            Service oldService = selectedService;
+            selectedService = null;
+            for (int i = 0; i < serviceList.size(); i++) {
+                Service newService = serviceList.get(i);
+                if (oldService.equals(newService)) {
+                    selectedService = newService;
+                    this.onServiceSelected(i);
+                    this.restoreNodeSelection(newService.getNodes());
+                }
+            }
+            if (selectedService == null) {
+                selectedNode = null;
+                Toast toast = Toast.makeText(this, R.string.unavailable_service_selection, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    }
+
+    private void restoreNodeSelection(List<Node> nodeList) {
+        if (selectedNode != null) {
+            Node oldNode = selectedNode;
+            selectedNode = null;
+            for (int i = 0; i < nodeList.size(); i++) {
+                Node newNode = nodeList.get(i);
+                if (oldNode.equals(newNode)) {
+                    selectedNode = newNode;
+                    this.onNodeSelected(i);
+                }
+            }
+            if (selectedNode == null) {
+                Toast toast = Toast.makeText(this, R.string.unavailable_node_selection, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
     }
 
     @Override

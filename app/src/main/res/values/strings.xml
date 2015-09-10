@@ -13,4 +13,8 @@
     <string name="communication_successful">Refresh successful.</string>
     <string name="error_invalid_url">URL is invalid.</string>
     <string name="communication_failed">Refresh failed.</string>
+    <string name="application_not_configured">Application not configured.</string>
+    <string name="unavailable_node_selection">Current node selection is no longer available.</string>
+    <string name="unavailable_service_selection">Current service selection is no longer available.</string>
+    <string name="unavailable_environment_selection">Current environment selection is no longer available.</string>
 </resources>

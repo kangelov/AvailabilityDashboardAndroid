@@ -68,4 +68,13 @@ public class ListEntry implements Serializable {
         return getName();
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!this.getClass().isInstance(o)) return false;
+        ListEntry other = (ListEntry) o;
+        return ((this.getName() == null && other.getName() == null) ||
+                (this.getName().equals(other.getName())));
+    }
 }
