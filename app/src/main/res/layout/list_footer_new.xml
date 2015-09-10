@@ -12,7 +12,7 @@
         android:background="@color/background_material_light"
         android:enabled="true"
         android:gravity="center"
-        android:text="Not Yet Updated\nSwipe down to refresh."
+        android:text="No Data Loaded\nSwipe down to refresh."
         android:textStyle="bold" />
 
 </LinearLayout>
