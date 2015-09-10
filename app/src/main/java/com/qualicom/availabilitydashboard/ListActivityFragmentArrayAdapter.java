@@ -48,13 +48,13 @@ public class ListActivityFragmentArrayAdapter extends ArrayAdapter<ListEntry> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.list_entry, parent, false);
+        View rowView = inflater.inflate(doShowDescription ? R.layout.list_entry_with_desc : R.layout.list_entry, parent, false);
         TextView nameView = (TextView) rowView.findViewById(R.id.nameTextView);
         TextView descriptionView = (TextView) rowView.findViewById(R.id.descriptionTextView);
         ImageView statusView = (ImageView) rowView.findViewById(R.id.statusImageView);
 
         nameView.setText(entries.get(position).getName());
-        descriptionView.setText(doShowDescription ? entries.get(position).getDescription() : null);
+        if (doShowDescription) descriptionView.setText(entries.get(position).getDescription());
         if (entries.get(position).getStatus() != null && STATUS_TO_ICON_MAP.containsKey(entries.get(position).getStatus())) {
             statusView.setImageResource(STATUS_TO_ICON_MAP.get(entries.get(position).getStatus()));
         } else {
