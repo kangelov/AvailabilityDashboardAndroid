@@ -251,23 +251,25 @@ public class ListActivity extends AppCompatActivity
     public void onBackPressed() {
         super.onBackPressed();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_container);
-        if (fragment instanceof EnvironmentListActivityFragment) {
-            Log.i("BACK", "Back to environment fragment");
-            selectedEnvironment = null;
-            selectedService = null;
-            selectedNode = null;
-        } else if (fragment instanceof ServiceListActivityFragment) {
-            Log.i("BACK", "Back to service fragment");
-            selectedService = null;
-            selectedNode = null;
-        } else if (mTwoPane && fragment instanceof NodeListActivityFragment) {
+        if (fragment != null) {
+            if (fragment instanceof EnvironmentListActivityFragment) {
+                Log.i("BACK", "Back to environment fragment");
+                selectedEnvironment = null;
+                selectedService = null;
+                selectedNode = null;
+            } else if (fragment instanceof ServiceListActivityFragment) {
+                Log.i("BACK", "Back to service fragment");
+                selectedService = null;
+                selectedNode = null;
+            } else if (mTwoPane && fragment instanceof NodeListActivityFragment) {
             /*
             In a two-panel arrangement (e.g. tablet) there is no transition between List activity and Detail
             activity, it's all done within the list activity and the detail is just a fragment. Going back
             *should* trigger the onBackPressed handler. This needs to be tested.
             */
-            Log.i("BACK", "Back to node fragment");
-            selectedNode = null;
+                Log.i("BACK", "Back to node fragment");
+                selectedNode = null;
+            }
         }
     }
 
@@ -275,7 +277,7 @@ public class ListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_container);
-        if (!mTwoPane && fragment instanceof NodeListActivityFragment) {
+        if (!mTwoPane && fragment != null && fragment instanceof NodeListActivityFragment) {
             /*
             In a single-panel arrangement (e.g. phone) there is a transition to a new activity. The Detail
             fragment is in a separate activity, so going back changes the entire activity. onBackPressed
@@ -313,7 +315,7 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void handleResponse(List<Environment> environmentList) {
+    public void handleRefresh() {
         Toast toast = Toast.makeText(this, R.string.communication_successful, Toast.LENGTH_SHORT);
         toast.show();
 
@@ -321,7 +323,7 @@ public class ListActivity extends AppCompatActivity
         for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++)
             getSupportFragmentManager().popBackStack();
 
-        restoreEnvironmentSelection(environmentList);
+        restoreEnvironmentSelection(getDisplayList());
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setRefreshing(false);
@@ -347,6 +349,9 @@ public class ListActivity extends AppCompatActivity
                 Toast toast = Toast.makeText(this, R.string.unavailable_environment_selection, Toast.LENGTH_SHORT);
                 toast.show();
             }
+        } else {
+            //if no selections exist, we just set the new list and we are good to go.
+            resetSelections(environmentList);
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface CommunicationCallbacks {
 
-    void handleResponse(List<Environment> environmentList);
+    void handleRefresh();
 
     void handleError(String message);
 
