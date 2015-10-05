@@ -1,8 +1,8 @@
 package com.qualicom.availabilitydashboard;
 
 import android.app.Activity;
-import android.support.v4.app.ListFragment;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,27 +17,23 @@ import java.util.List;
  */
 public abstract class ListActivityFragment extends ListFragment {
 
+    public static final String ARG_DISPLAY_LIST = "displayList";
+    public static final String ARG_ONE_CLICK_ACTIVATION = "oneClickActivation";
     /**
      * The serialization (saved instance state) Bundle key representing the
      * activated item position. Only used on tablets.
      */
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-    public static final String ARG_DISPLAY_LIST = "displayList";
-    public static final String ARG_ONE_CLICK_ACTIVATION = "oneClickActivation";
-
     /**
      * The fragment's current callback object, which is notified of list item
      * clicks.
      */
     protected ListActivityFragmentCallbacks mCallbacks = null;
-
+    protected List<ListEntry> displayList;
     /**
      * The current activated item position. Only used on tablets.
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
-
-    protected List<ListEntry> displayList;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,11 +56,7 @@ public abstract class ListActivityFragment extends ListFragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            displayList = (List<ListEntry>)getArguments().getSerializable(ARG_DISPLAY_LIST);
-            setListAdapter(new ListActivityFragmentArrayAdapter(
-                    getActivity(),
-                    displayList,
-                    doDisplayDescriptions()));
+            setDisplayList((List<ListEntry>) getArguments().getSerializable(ARG_DISPLAY_LIST));
         }
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null
@@ -142,4 +134,14 @@ public abstract class ListActivityFragment extends ListFragment {
         mCallbacks.setListTitle(getTitle());
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
+    public void setDisplayList(List displayList) {
+        this.displayList = displayList;
+        setListAdapter(new ListActivityFragmentArrayAdapter(
+                getActivity(),
+                displayList,
+                doDisplayDescriptions()));
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.qualicom.availabilitydashboard.net;
 
 import android.database.sqlite.SQLiteException;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -103,6 +104,8 @@ public class CommunicationManager {
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     HashMap<String, String> headers = new HashMap<String, String>();
                     headers.put("Accept", "application/json");
+                    String encodedAuthorization = new String(Base64.encode(new String(settings.getUsername() + ":" + settings.getPassword()).getBytes(), Base64.DEFAULT));
+                    headers.put("Authorization", "Basic " + encodedAuthorization);
                     return headers;
                 }
             };

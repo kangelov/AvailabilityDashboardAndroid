@@ -256,10 +256,12 @@ public class ListActivity extends AppCompatActivity
             selectedEnvironment = null;
             selectedService = null;
             selectedNode = null;
+            ((EnvironmentListActivityFragment) fragment).setDisplayList(displayList);
         } else if (fragment instanceof ServiceListActivityFragment) {
             Log.i("BACK", "Back to service fragment");
             selectedService = null;
             selectedNode = null;
+            ((ServiceListActivityFragment) fragment).setDisplayList(selectedEnvironment.getServices());
         } else if (mTwoPane && fragment instanceof NodeListActivityFragment) {
             /*
             In a two-panel arrangement (e.g. tablet) there is no transition between List activity and Detail
@@ -268,6 +270,7 @@ public class ListActivity extends AppCompatActivity
             */
             Log.i("BACK", "Back to node fragment");
             selectedNode = null;
+            ((NodeListActivityFragment) fragment).setDisplayList(selectedService.getNodes());
         }
     }
 
@@ -334,6 +337,7 @@ public class ListActivity extends AppCompatActivity
             for (int i = 0; i < environmentList.size(); i++) {
                 Environment newEnvironment = environmentList.get(i);
                 if (oldEnvironment.equals(newEnvironment)) {
+                    this.displayList = environmentList;
                     selectedEnvironment = newEnvironment;
                     this.onEnvironmentSelected(i);
                     this.restoreServiceSelection(newEnvironment.getServices());
