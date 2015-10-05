@@ -88,7 +88,7 @@ public class CommunicationManager {
                         settings.setLastRefreshDate(DATEFORMAT.format(new Date()));
                         settings.setLastUpdateDate(DATEFORMAT.format(availabilityResponse.getUpdateTime()));
                         pm.setSettings(settings);
-                        handler.handleResponse(availabilityResponse.getEnvironments());
+                        handler.handleRefresh();
                     } catch (SQLiteException e) {
                         handler.handleError(e.getLocalizedMessage());
                     }
