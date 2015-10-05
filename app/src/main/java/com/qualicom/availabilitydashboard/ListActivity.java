@@ -338,6 +338,9 @@ public class ListActivity extends AppCompatActivity
                 Environment newEnvironment = environmentList.get(i);
                 if (oldEnvironment.equals(newEnvironment)) {
                     this.displayList = environmentList;
+                    FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
+                    txn.replace(R.id.footer_container, new ListFooterFragment());
+                    txn.commit();
                     selectedEnvironment = newEnvironment;
                     this.onEnvironmentSelected(i);
                     this.restoreServiceSelection(newEnvironment.getServices());
